@@ -1,0 +1,7 @@
+.vscode/
+.gradle
+app/build
+app/bin/
+out/
+app/lombok.config
+*.loc.bat
