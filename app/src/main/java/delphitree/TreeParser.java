@@ -1,4 +1,4 @@
-package delfitree;
+package delphitree;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import delfitree.exceptions.TreeParserException;
+import delphitree.exceptions.TreeParserException;
 
 public class TreeParser
 {
@@ -73,7 +73,8 @@ public class TreeParser
         String content,
         Forest forest,
         IncludeType includeType,
-        String prefix
+        String prefix,
+        int indent
     ) {
         Pattern pattern = Pattern.compile(regExp, Pattern.MULTILINE);
         Matcher matcher = pattern.matcher(content);
@@ -87,15 +88,22 @@ public class TreeParser
             includes = includes.replaceAll("\\{\\$ELSE\\}", "");
             includes = includes.replaceAll("\\{\\$ENDIF\\}", "");
 
-            final String regExpInner = String.format("(%s[^\\s,]+)", prefix);
+            final String regExpInner = String.format("(%s[^\\s,;]+)", prefix);
             Pattern patternInner = Pattern.compile(regExpInner, Pattern.MULTILINE);
             Matcher matcherInner = patternInner.matcher(includes);
 
+            indent += 2;
             while (matcherInner.find())
             {
-                String subModuleName = matcherInner.group(0);
-                Node subModuleNode = parseModule(subModuleName, forest, includeType, prefix);
-
+                String subModuleName = matcherInner.group(0).replaceAll("\\s", "");
+                String strIndent = new String(new char[indent + 2]).replace("\0", " ");
+                System.out.println("|" + strIndent + subModuleName);
+                Node subModuleNode = parseModule(
+                    subModuleName,
+                    forest,
+                    includeType,
+                    prefix,
+                    indent);
                 dependecies.add(subModuleNode);
             }
         }
@@ -103,11 +111,41 @@ public class TreeParser
         return dependecies;
     }
 
+    private String getStopWords(boolean iface)
+    {
+        String words[];
+
+        if (iface) {
+            words = new String[] {
+                "type",
+                "const",
+                "var",
+                "function",
+                "procedure",
+                "implementation"
+            };
+        } else {
+            words = new String[] {
+                "type",
+                "const",
+                "var",
+                "function",
+                "procedure",
+                "initialization",
+                "finalization",
+                "end"
+            };
+        }
+
+        return String.format("^%s", String.join("|^", words));
+    }
+
     private Node parseModule(
         String moduleName,
         Forest forest,
         IncludeType includeType,
-        String prefix
+        String prefix,
+        int indent
     ) {
         Node moduleNode = forest.getNodeByName(moduleName);
 
@@ -122,6 +160,8 @@ public class TreeParser
                 File module = new File(folderName, fileName);
                 if (module.exists())
                 {
+                    String strIndent = new String(new char[indent]).replace("\0", " ");
+                    System.out.println("|" + strIndent + moduleName);
                     content = readFile(module);
                 } else {
                     moduleNode.setCustom(false);
@@ -131,17 +171,24 @@ public class TreeParser
                 throw new TreeParserException(e.getMessage());
             }
 
+            content = content.replaceAll("\\/\\/.*", "");
+            content = content.replaceAll("\\/\\*[\\S\\s]*\\*\\/", "");
+            content = content.replaceAll("\\(\\*[\\S\\s]*\\*\\)", "");
+
             String regExp;
             List<Node> dependencies;
 
             if (includeType.enabledFor(IncludeType.Interface)) {
-                regExp = "^interface\\s+uses[\\s]+([^;]+);$";
+                String strIndent = new String(new char[indent]).replace("\0", " ");
+                System.out.println("|" + strIndent + "interfaces:");
+                regExp = String.format("interface[\\s\\S]+uses([\\s\\S]+?(?=%s))", getStopWords(true));
                 dependencies = getDependencies(
                     regExp,
                     content,
                     forest,
                     includeType,
-                    prefix
+                    prefix,
+                    indent
                 );
 
                 for (Node node : dependencies) {
@@ -151,13 +198,16 @@ public class TreeParser
             }
 
             if (includeType.enabledFor(IncludeType.Implementation)) {
-                regExp = "^implementation\\s+uses[\\s]+([^;]+);$";
+                String strIndent = new String(new char[indent]).replace("\0", " ");
+                System.out.println("|" + strIndent + "implementations:");
+                regExp = String.format("implementation[\\s\\S]+uses([\\s\\S]+?(?=%s))", getStopWords(false));
                 dependencies = getDependencies(
                     regExp,
                     content,
                     forest,
                     includeType,
-                    prefix
+                    prefix,
+                    indent
                 );
 
                 for (Node node : dependencies) {
@@ -187,7 +237,7 @@ public class TreeParser
 
         for (String moduleName : modules)
         {
-            parseModule(moduleName, forest, includeType, prefix);
+            parseModule(moduleName, forest, includeType, prefix, 0);
         }
 
         forest.clear();

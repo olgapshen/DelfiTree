@@ -1,4 +1,4 @@
-package delfitree;
+package delphitree;
 
 import static org.junit.jupiter.api.Assertions.*;
 

@@ -1,6 +1,6 @@
-package delfitree;
+package delphitree;
 
-import delfitree.exceptions.UnhandledIncludeType;
+import delphitree.exceptions.UnhandledIncludeType;
 
 public enum IncludeType {
     None((byte)0x00),

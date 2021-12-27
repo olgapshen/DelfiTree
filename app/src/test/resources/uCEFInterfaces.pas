@@ -17,7 +17,7 @@ uses
   {$ELSE}
     {$IFDEF MSWINDOWS}Windows,{$ENDIF} Classes,
   {$ENDIF}
-  uCEFTypes, uCEFSchemeRegistrar;
+  uCEFTypes, uCEFSchemeRegistrar, uCEFConstants;
 
 type
   ICefBrowser = interface;

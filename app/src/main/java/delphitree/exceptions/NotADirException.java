@@ -1,4 +1,4 @@
-package delfitree.exceptions;
+package delphitree.exceptions;
 
 public class NotADirException extends RuntimeException {
     public NotADirException(String path) {

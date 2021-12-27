@@ -1,4 +1,4 @@
-package delfitree;
+package delphitree;
 
 import java.io.File;
 import java.io.OutputStream;
@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import delfitree.exceptions.GraphBuilderException;
+import delphitree.exceptions.GraphBuilderException;
 import lombok.Data;
 
 import java.io.BufferedOutputStream;

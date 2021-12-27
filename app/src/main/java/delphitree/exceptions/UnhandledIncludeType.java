@@ -1,6 +1,6 @@
-package delfitree.exceptions;
+package delphitree.exceptions;
 
-import delfitree.IncludeType;
+import delphitree.IncludeType;
 
 public class UnhandledIncludeType extends RuntimeException {
     public UnhandledIncludeType(IncludeType includeType) {

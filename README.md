@@ -1,8 +1,8 @@
-# Иерархия классов на Delfi
+# Иерархия классов на Delphi
 
 ## Общее
 
-Утилита помогает создать иерархию классов на Delfi.
+Утилита помогает создать иерархию классов на Delphi.
 
 Утилита парсит необходимые области в зависимости от указанного параметра.
 
@@ -16,7 +16,15 @@
 ## Сборка
 
 ```
-$ ./gradlew build
+> gradlew build
+```
+
+## Очистка
+
+Для очистки папки `umls` используйте скрипт `clean.bat`:
+
+```bat
+> clean.bat
 ```
 
 ## Запуск
@@ -30,6 +38,14 @@ $ ./gradlew build
 4. Префикс классов
 5. Имя модуля
 
+Папка с файлами ввода:
+
+* Относительный путь от папки `app`
+
+Папка для вывода:
+
+* *Папку для вывода желательно указать: umls*
+
 Типы области включения:
 
 1. none
@@ -42,20 +58,33 @@ $ ./gradlew build
 1. root
 2. all
 
-*Папку для вывода желательно указать: umls*
+Префикс классов:
 
-```
-$ ./gradlew run --args="<path_to_delfi_source> <path_to_output> <include_type> <root> <prefix> <module_name>"
+* \- (минус) для отмены префикса
+
+
+```bat
+> gradlew run --args="<path_to_delphi_source> <path_to_output> <include_type> <root> <prefix> <module_name>"
 ```
 
 Вызов без параметров выдаст подсказку:
 
-```
-java -jar app.jar <sources> <out> uses [prefix] [unit]
-  <sources> путь к файлам Delfi
+```bat
+java -jar app.jar <sources> <out> uses [-|prefix] [unit]
+  <sources> путь к файлам Delphi
   <out>     путь к папке вывода
   uses      none|iface|impl|both
   root      root|all
   prefix    опциональный префикс модулей
   unit      опциональное имя модуля
+```
+
+Примеры:
+
+```bat
+> gradlew run --args="..\..\cef4delphi\source umls iface all - uCEFRequestHandler"
+```
+
+```bat
+> gradlew run --args="..\..\cef4delphi\source umls iface all uCEF"
 ```

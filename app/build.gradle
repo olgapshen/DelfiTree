@@ -27,7 +27,7 @@ dependencies {
 
 application {
     // Define the main class for the application.
-    mainClass = 'delfitree.App'
+    mainClass = 'delphitree.App'
 }
 
 tasks.named('test') {

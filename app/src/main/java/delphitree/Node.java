@@ -1,11 +1,11 @@
-package delfitree;
+package delphitree;
 
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import delfitree.exceptions.UnhandledIncludeType;
+import delphitree.exceptions.UnhandledIncludeType;
 import lombok.Data;
 
 @Data
@@ -78,10 +78,34 @@ public class Node
         return findNode(moduleName, new LinkedList<>(), IncludeType.Implementation);
     }
 
+    private void merge(IncludeType includeType, List<Node> handled) {
+        if (handled.contains(this)) return;
+        else handled.add(this);
+
+        Set<Node> toremove = new HashSet<>();
+
+        for (Node child : getUses(includeType)) {
+            for (Node check : getUses(includeType)) {
+                if (child.toString().endsWith(String.format(".%s", check.toString())))
+                    toremove.add(check);
+            }
+        }
+
+        for (Node node : toremove) {
+            getUses(includeType).remove(node);
+        }
+
+        for (Node child : getUses(includeType)) {
+            child.merge(includeType, handled);
+        }
+    }
+
     private Set<Node> clear(IncludeType includeType, List<Node> handled)
     {
-        Set<Node> nodes = new HashSet<>();
         Set<Node> toremove = new HashSet<>();
+        Set<Node> nodes = new HashSet<>();
+
+        //System.out.println("==== " + this.toString() + " ====");
 
         for (Node child : getUses(includeType)) {
             if (handled.contains(child)) continue;
@@ -106,6 +130,8 @@ public class Node
     {
         clear(IncludeType.Interface, new LinkedList<>());
         clear(IncludeType.Implementation, new LinkedList<>());
+        merge(IncludeType.Interface, new LinkedList<>());
+        merge(IncludeType.Implementation, new LinkedList<>());
     }
 
     @Override
